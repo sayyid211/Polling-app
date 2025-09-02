@@ -16,7 +16,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   setLoading: (loading: boolean) => set({ isLoading: loading }),
 }));
 
-// Authentication utilities
+// Authentication utilities (deprecated - use useAuth hook instead)
 export const authUtils = {
   // Check if user is authenticated
   isAuthenticated: () => {
@@ -28,7 +28,7 @@ export const authUtils = {
     return useAuthStore.getState().user;
   },
 
-  // Mock login function (replace with actual auth implementation)
+  // Mock login function (deprecated - use useAuth hook instead)
   login: async (email: string, password: string): Promise<User> => {
     // TODO: Implement actual authentication logic
     const mockUser: User = {
@@ -43,7 +43,7 @@ export const authUtils = {
     return mockUser;
   },
 
-  // Mock logout function
+  // Mock logout function (deprecated - use useAuth hook instead)
   logout: () => {
     useAuthStore.getState().logout();
   },

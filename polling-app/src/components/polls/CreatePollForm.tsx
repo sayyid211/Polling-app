@@ -1,20 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { CreatePollData } from '@/types';
+import { createPoll } from '@/lib/actions';
+import { useAuthStore } from '@/lib/auth';
 
-interface CreatePollFormProps {
-  onSubmit: (data: CreatePollData) => void;
-  isLoading?: boolean;
-}
-
-export function CreatePollForm({ onSubmit, isLoading = false }: CreatePollFormProps) {
+export function CreatePollForm() {
+  const router = useRouter();
+  const { user, isAuthenticated } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [options, setOptions] = useState(['', '']);
@@ -39,9 +38,14 @@ export function CreatePollForm({ onSubmit, isLoading = false }: CreatePollFormPr
     setOptions(newOptions);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!isAuthenticated || !user) {
+      setError('You must be logged in to create a poll');
+      return;
+    }
 
     if (!title.trim()) {
       setError('Poll title is required');
@@ -54,15 +58,47 @@ export function CreatePollForm({ onSubmit, isLoading = false }: CreatePollFormPr
       return;
     }
 
-    const pollData: CreatePollData = {
-      title: title.trim(),
-      description: description.trim() || undefined,
-      options: validOptions,
-      allowMultipleVotes,
-    };
+    setIsLoading(true);
+    setError('');
 
-    onSubmit(pollData);
+    try {
+      const result = await createPoll({
+        title: title.trim(),
+        description: description.trim() || undefined,
+        options: validOptions,
+        allowMultipleVotes,
+      }, user.id);
+
+      if (result.success) {
+        // Redirect to the new poll
+        router.push(`/polls/${result.pollId}`);
+      } else {
+        setError(result.error || 'Failed to create poll');
+      }
+    } catch (err) {
+      setError('An unexpected error occurred');
+      console.error('Error creating poll:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardContent className="pt-6">
+          <div className="text-center">
+            <p className="text-muted-foreground mb-4">
+              You must be logged in to create a poll
+            </p>
+            <Button onClick={() => router.push('/auth/login')}>
+              Sign In
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
