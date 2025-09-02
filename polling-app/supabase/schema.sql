@@ -64,33 +64,33 @@ alter table public.poll_options enable row level security;
 alter table public.votes enable row level security;
 
 -- Profiles policies
-create policy if not exists "profiles_select_all" on public.profiles
+create policy "profiles_select_all" on public.profiles
   for select using (true);
 
-create policy if not exists "profiles_update_own" on public.profiles
+create policy "profiles_update_own" on public.profiles
   for update using (auth.uid() = id);
 
-create policy if not exists "profiles_insert_own" on public.profiles
+create policy "profiles_insert_own" on public.profiles
   for insert with check (auth.uid() = id);
 
 -- Polls policies
-create policy if not exists "polls_select_active" on public.polls
+create policy "polls_select_active" on public.polls
   for select using (status = 'active');
 
-create policy if not exists "polls_select_own" on public.polls
+create policy "polls_select_own" on public.polls
   for select using (auth.uid() = created_by);
 
-create policy if not exists "polls_insert_auth" on public.polls
+create policy "polls_insert_auth" on public.polls
   for insert with check (auth.uid() = created_by);
 
-create policy if not exists "polls_update_own" on public.polls
+create policy "polls_update_own" on public.polls
   for update using (auth.uid() = created_by);
 
-create policy if not exists "polls_delete_own" on public.polls
+create policy "polls_delete_own" on public.polls
   for delete using (auth.uid() = created_by);
 
 -- Poll options policies
-create policy if not exists "options_select_active" on public.poll_options
+create policy "options_select_active" on public.poll_options
   for select using (
     exists (
       select 1 from public.polls p
@@ -98,7 +98,7 @@ create policy if not exists "options_select_active" on public.poll_options
     )
   );
 
-create policy if not exists "options_select_own" on public.poll_options
+create policy "options_select_own" on public.poll_options
   for select using (
     exists (
       select 1 from public.polls p
@@ -106,7 +106,7 @@ create policy if not exists "options_select_own" on public.poll_options
     )
   );
 
-create policy if not exists "options_insert_own" on public.poll_options
+create policy "options_insert_own" on public.poll_options
   for insert with check (
     exists (
       select 1 from public.polls p
@@ -114,7 +114,7 @@ create policy if not exists "options_insert_own" on public.poll_options
     )
   );
 
-create policy if not exists "options_update_own" on public.poll_options
+create policy "options_update_own" on public.poll_options
   for update using (
     exists (
       select 1 from public.polls p
@@ -122,7 +122,7 @@ create policy if not exists "options_update_own" on public.poll_options
     )
   );
 
-create policy if not exists "options_delete_own" on public.poll_options
+create policy "options_delete_own" on public.poll_options
   for delete using (
     exists (
       select 1 from public.polls p
@@ -131,7 +131,7 @@ create policy if not exists "options_delete_own" on public.poll_options
   );
 
 -- Votes policies
-create policy if not exists "votes_select_active" on public.votes
+create policy "votes_select_active" on public.votes
   for select using (
     exists (
       select 1 from public.polls p
@@ -139,10 +139,10 @@ create policy if not exists "votes_select_active" on public.votes
     )
   );
 
-create policy if not exists "votes_select_own" on public.votes
+create policy "votes_select_own" on public.votes
   for select using (auth.uid() = user_id);
 
-create policy if not exists "votes_insert_auth_active" on public.votes
+create policy "votes_insert_auth_active" on public.votes
   for insert with check (
     auth.uid() = user_id and
     exists (
@@ -151,7 +151,7 @@ create policy if not exists "votes_insert_auth_active" on public.votes
     )
   );
 
-create policy if not exists "votes_delete_own" on public.votes
+create policy "votes_delete_own" on public.votes
   for delete using (auth.uid() = user_id);
 
 -- Updated timestamp trigger function
