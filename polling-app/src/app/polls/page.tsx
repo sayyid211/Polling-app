@@ -5,7 +5,7 @@ import { PollCard } from '@/components/polls/PollCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Poll, mockPolls } from '@/lib/api';
+import { Poll } from '@/types';
 
 export default function PollsPage() {
   const [polls, setPolls] = useState<Poll[]>([]);
@@ -15,12 +15,11 @@ export default function PollsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Replace with actual API call
     const loadPolls = async () => {
       try {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setPolls(mockPolls);
+        // TODO: Replace with actual API call using server actions
+        // For now, using empty array until we implement the getPolls action
+        setPolls([]);
       } catch (error) {
         console.error('Failed to load polls:', error);
       } finally {
